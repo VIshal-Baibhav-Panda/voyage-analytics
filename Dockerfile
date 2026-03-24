@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 5001
 
-CMD ["python", "api/app.py"]
+CMD ["gunicorn", "api.app:app", "--bind", "0.0.0.0:10000"]

@@ -10,3 +10,4 @@ joblib
 xgboost
 notebook
 requests
+gunicorn
