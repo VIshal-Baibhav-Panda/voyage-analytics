@@ -2,27 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>✈ Flight Price Predictor</title>
+<title>✈ Voyage Analytics</title>
+
 <style>
 body {
     font-family: Arial;
     background: linear-gradient(135deg, #1e3c72, #2a5298);
     color: white;
     text-align: center;
-    padding: 40px;
+    padding: 30px;
+}
+
+h1 {
+    margin-bottom: 20px;
 }
 
 .container {
     background: white;
     color: black;
-    padding: 30px;
+    padding: 25px;
     border-radius: 15px;
-    width: 400px;
+    width: 420px;
     margin: auto;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
 
-input, select {
+input {
     width: 100%;
     padding: 10px;
     margin: 8px 0;
@@ -33,6 +38,7 @@ input, select {
 button {
     width: 100%;
     padding: 12px;
+    margin-top: 10px;
     background: #2a5298;
     color: white;
     border: none;
@@ -46,8 +52,8 @@ button:hover {
 }
 
 .result {
-    margin-top: 20px;
-    font-size: 20px;
+    margin-top: 15px;
+    font-size: 18px;
     font-weight: bold;
 }
 </style>
@@ -55,7 +61,7 @@ button:hover {
 
 <body>
 
-<h1>✈ Flight Price Predictor</h1>
+<h1>✈ Voyage Analytics</h1>
 
 <div class="container">
 
@@ -69,14 +75,19 @@ button:hover {
 <input id="agency" placeholder="Agency">
 <input id="date" placeholder="Date (MM/DD/YYYY)">
 
-<button onclick="predict()">Predict Price</button>
+<button onclick="predictPrice()">💰 Predict Price</button>
+<button onclick="predictGender()">🧑 Predict Gender</button>
+<button onclick="recommend()">🌍 Get Recommendations</button>
 
 <div class="result" id="result"></div>
 
 </div>
 
 <script>
-async function predict() {
+
+// 🔥 PRICE PREDICTION
+async function predictPrice() {
+
     const data = {
         travelCode: document.getElementById("travelCode").value,
         userCode: Number(document.getElementById("userCode").value),
@@ -89,25 +100,54 @@ async function predict() {
         date: document.getElementById("date").value
     };
 
-    try {
-        const response = await fetch("/predict-price")
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        });
+    const res = await fetch("/predict-price", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
 
-        const result = await response.json();
+    const result = await res.json();
 
-        document.getElementById("result").innerText =
-            "💰 Price: " + result.price;
-
-    } catch (error) {
-        document.getElementById("result").innerText =
-            "❌ Error connecting API";
-    }
+    document.getElementById("result").innerText =
+        "💰 Price: " + result.price;
 }
+
+
+// 🔥 GENDER
+async function predictGender() {
+
+    const userCode = document.getElementById("userCode").value;
+
+    const res = await fetch("/predict-gender", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({userCode: userCode})
+    });
+
+    const data = await res.json();
+
+    document.getElementById("result").innerText =
+        "🧑 Gender: " + data.gender;
+}
+
+
+// 🔥 RECOMMENDATION
+async function recommend() {
+
+    const from = document.getElementById("from").value;
+
+    const res = await fetch("/recommend", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({from: from})
+    });
+
+    const data = await res.json();
+
+    document.getElementById("result").innerText =
+        "🌍 Suggestions: " + data.recommendations.join(", ");
+}
+
 </script>
 
 </body>

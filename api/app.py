@@ -46,6 +46,31 @@ def predict_price():
 
     except Exception as e:
         return jsonify({"error": str(e)})
+    
+@app.route("/predict-gender", methods=["POST"])
+def gender():
+    data = request.json
+    user_code = data.get("userCode")
+
+    result = predict_gender(user_code)
+
+    return jsonify({
+        "gender": result
+    })
+
+@app.route("/recommend", methods=["POST"])
+def recommend():
+    data = request.json
+
+    source = data.get("from")
+    budget = data.get("budget", 5000)
+
+    result = recommend_destination(source, budget)
+
+    return jsonify({
+        "recommendations": result
+    })
+    
 # ✅ DOCKER FIX
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=False)
