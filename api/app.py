@@ -108,6 +108,24 @@ def full_analysis():
     except Exception as e:
         return jsonify({"error": str(e)})
     
+@app.route("/full-analysis", methods=["POST"])
+def full_analysis():
+    data = request.json
+
+    # Price
+    price = model.predict([list(data.values())])[0]
+
+    # Dummy gender logic
+    gender = "Male" if int(data["userCode"]) % 2 == 0 else "Female"
+
+    # Dummy recommendations
+    recommendations = ["Goa", "Kerala", "Dubai"]
+
+    return jsonify({
+        "price": float(price),
+        "gender": gender,
+        "recommendations": recommendations
+    })
 
 # ✅ DOCKER FIX
 if __name__ == "__main__":

@@ -13,10 +13,6 @@ body {
     padding: 30px;
 }
 
-h1 {
-    margin-bottom: 20px;
-}
-
 .container {
     background: white;
     color: black;
@@ -66,15 +62,15 @@ button:hover {
 
 <div class="container">
 
-<input id="travelCode" placeholder="Travel Code (TC001)">
+<input id="travelCode" placeholder="Travel Code">
 <input id="userCode" placeholder="User Code">
-<input id="from" placeholder="From (Delhi)">
-<input id="to" placeholder="To (Mumbai)">
-<input id="flightType" placeholder="Flight Type (Economy)">
+<input id="from" placeholder="From">
+<input id="to" placeholder="To">
+<input id="flightType" placeholder="Flight Type">
 <input id="time" placeholder="Time">
 <input id="distance" placeholder="Distance">
 <input id="agency" placeholder="Agency">
-<input id="date" placeholder="Date (MM/DD/YYYY)">
+<input id="date" placeholder="Date">
 
 <button onclick="predictPrice()">💰 Predict Price</button>
 <button onclick="predictGender()">🧑 Predict Gender</button>
@@ -87,117 +83,87 @@ button:hover {
 
 <script>
 
-// 🔥 PRICE PREDICTION
+// PRICE
 async function predictPrice() {
-    try {
-        const data = {
-            travelCode: document.getElementById("travelCode").value,
-            userCode: Number(document.getElementById("userCode").value),
-            from: document.getElementById("from").value,
-            to: document.getElementById("to").value,
-            flightType: document.getElementById("flightType").value,
-            time: Number(document.getElementById("time").value),
-            distance: Number(document.getElementById("distance").value),
-            agency: document.getElementById("agency").value,
-            date: document.getElementById("date").value
-        };
+    const data = getFormData();
 
-        const res = await fetch("/predict-price", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(data)
-        });
+    const res = await fetch("/predict-price", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
 
-        const result = await res.json();
+    const result = await res.json();
 
-        document.getElementById("result").innerText =
-            "💰 Price: " + result.predicted_price;
-
-    } catch (err) {
-        console.error(err);
-        alert("Error in Price API");
-    }
+    document.getElementById("result").innerText =
+        "💰 Price: " + (result.predicted_price || "Error");
 }
 
-
-// 🔥 GENDER
+// GENDER
 async function predictGender() {
-    try {
-        const userCode = document.getElementById("userCode").value;
+    const userCode = document.getElementById("userCode").value;
 
-        const res = await fetch("/predict-gender", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({userCode: userCode})
-        });
+    const res = await fetch("/predict-gender", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({userCode})
+    });
 
-        const data = await res.json();
+    const data = await res.json();
 
-        document.getElementById("result").innerText =
-            "🧑 Gender: " + data.gender;
-
-    } catch (err) {
-        console.error(err);
-        alert("Error in Gender API");
-    }
+    document.getElementById("result").innerText =
+        "🧑 Gender: " + (data.gender || "Unknown");
 }
 
-
-// 🔥 RECOMMENDATION
+// RECOMMEND
 async function recommend() {
-    try {
-        const from = document.getElementById("from").value;
+    const from = document.getElementById("from").value;
 
-        const res = await fetch("/recommend", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({from: from})
-        });
+    const res = await fetch("/recommend", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({from})
+    });
 
-        const data = await res.json();
+    const data = await res.json();
 
-        document.getElementById("result").innerText =
-            "🌍 Suggestions: " + data.recommendations.join(", ");
-
-    } catch (err) {
-        console.error(err);
-        alert("Error in Recommendation API");
-    }
+    document.getElementById("result").innerText =
+        "🌍 Suggestions: " +
+        (data.recommendations ? data.recommendations.join(", ") : "No data");
 }
 
-
-// 🔥 FULL ANALYSIS
+// FULL ANALYSIS (SAFE)
 async function fullAnalysis() {
-    try {
-        const data = {
-            travelCode: document.getElementById("travelCode").value,
-            userCode: Number(document.getElementById("userCode").value),
-            from: document.getElementById("from").value,
-            to: document.getElementById("to").value,
-            flightType: document.getElementById("flightType").value,
-            time: Number(document.getElementById("time").value),
-            distance: Number(document.getElementById("distance").value),
-            agency: document.getElementById("agency").value,
-            date: document.getElementById("date").value
-        };
+    const data = getFormData();
 
-        const res = await fetch("/full-analysis", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(data)
-        });
+    const res = await fetch("/full-analysis", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
 
-        const result = await res.json();
+    const result = await res.json();
 
-        document.getElementById("result").innerText =
-            "💰 Price: " + result.price + "\n" +
-            "🧑 Gender: " + result.gender + "\n" +
-            "🌍 Suggestions: " + result.recommendations.join(", ");
+    document.getElementById("result").innerText =
+        "💰 Price: " + (result.price || "N/A") + "\n" +
+        "🧑 Gender: " + (result.gender || "N/A") + "\n" +
+        "🌍 Suggestions: " +
+        (result.recommendations ? result.recommendations.join(", ") : "No recommendations");
+}
 
-    } catch (err) {
-        console.error(err);
-        alert("Error in Full Analysis");
-    }
+// HELPER
+function getFormData() {
+    return {
+        travelCode: document.getElementById("travelCode").value,
+        userCode: Number(document.getElementById("userCode").value),
+        from: document.getElementById("from").value,
+        to: document.getElementById("to").value,
+        flightType: document.getElementById("flightType").value,
+        time: Number(document.getElementById("time").value),
+        distance: Number(document.getElementById("distance").value),
+        agency: document.getElementById("agency").value,
+        date: document.getElementById("date").value
+    };
 }
 
 </script>
