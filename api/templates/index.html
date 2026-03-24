@@ -90,7 +90,7 @@ async function predict() {
     };
 
     try {
-        const response = await fetch("https://voyage-analytics-af68.onrender.com", {
+        const response = await fetch("/predict-price")
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
