@@ -55,6 +55,7 @@ button:hover {
     margin-top: 15px;
     font-size: 18px;
     font-weight: bold;
+    white-space: pre-line;
 }
 </style>
 </head>
@@ -78,6 +79,7 @@ button:hover {
 <button onclick="predictPrice()">💰 Predict Price</button>
 <button onclick="predictGender()">🧑 Predict Gender</button>
 <button onclick="recommend()">🌍 Get Recommendations</button>
+<button onclick="fullAnalysis()">🚀 Full Analysis</button>
 
 <div class="result" id="result"></div>
 
@@ -87,94 +89,115 @@ button:hover {
 
 // 🔥 PRICE PREDICTION
 async function predictPrice() {
+    try {
+        const data = {
+            travelCode: document.getElementById("travelCode").value,
+            userCode: Number(document.getElementById("userCode").value),
+            from: document.getElementById("from").value,
+            to: document.getElementById("to").value,
+            flightType: document.getElementById("flightType").value,
+            time: Number(document.getElementById("time").value),
+            distance: Number(document.getElementById("distance").value),
+            agency: document.getElementById("agency").value,
+            date: document.getElementById("date").value
+        };
 
-    const data = {
-        travelCode: document.getElementById("travelCode").value,
-        userCode: Number(document.getElementById("userCode").value),
-        from: document.getElementById("from").value,
-        to: document.getElementById("to").value,
-        flightType: document.getElementById("flightType").value,
-        time: Number(document.getElementById("time").value),
-        distance: Number(document.getElementById("distance").value),
-        agency: document.getElementById("agency").value,
-        date: document.getElementById("date").value
-    };
+        const res = await fetch("/predict-price", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
 
-    const res = await fetch("/predict-price", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
-    });
+        const result = await res.json();
 
-    const result = await res.json();
+        document.getElementById("result").innerText =
+            "💰 Price: " + result.predicted_price;
 
-    document.getElementById("result").innerText =
-        "💰 Price: " + result.predicted_price;
+    } catch (err) {
+        console.error(err);
+        alert("Error in Price API");
+    }
 }
 
-<button onclick="fullAnalysis()">🚀 Full Analysis</button>
 
 // 🔥 GENDER
 async function predictGender() {
+    try {
+        const userCode = document.getElementById("userCode").value;
 
-    const userCode = document.getElementById("userCode").value;
+        const res = await fetch("/predict-gender", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({userCode: userCode})
+        });
 
-    const res = await fetch("/predict-gender", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({userCode: userCode})
-    });
+        const data = await res.json();
 
-    const data = await res.json();
+        document.getElementById("result").innerText =
+            "🧑 Gender: " + data.gender;
 
-    document.getElementById("result").innerText =
-        "🧑 Gender: " + data.gender;
+    } catch (err) {
+        console.error(err);
+        alert("Error in Gender API");
+    }
 }
 
 
 // 🔥 RECOMMENDATION
 async function recommend() {
+    try {
+        const from = document.getElementById("from").value;
 
-    const from = document.getElementById("from").value;
+        const res = await fetch("/recommend", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({from: from})
+        });
 
-    const res = await fetch("/recommend", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({from: from})
-    });
+        const data = await res.json();
 
-    const data = await res.json();
+        document.getElementById("result").innerText =
+            "🌍 Suggestions: " + data.recommendations.join(", ");
 
-    document.getElementById("result").innerText =
-        "🌍 Suggestions: " + data.recommendations.join(", ");
+    } catch (err) {
+        console.error(err);
+        alert("Error in Recommendation API");
+    }
 }
 
+
+// 🔥 FULL ANALYSIS
 async function fullAnalysis() {
+    try {
+        const data = {
+            travelCode: document.getElementById("travelCode").value,
+            userCode: Number(document.getElementById("userCode").value),
+            from: document.getElementById("from").value,
+            to: document.getElementById("to").value,
+            flightType: document.getElementById("flightType").value,
+            time: Number(document.getElementById("time").value),
+            distance: Number(document.getElementById("distance").value),
+            agency: document.getElementById("agency").value,
+            date: document.getElementById("date").value
+        };
 
-    const data = {
-        travelCode: document.getElementById("travelCode").value,
-        userCode: Number(document.getElementById("userCode").value),
-        from: document.getElementById("from").value,
-        to: document.getElementById("to").value,
-        flightType: document.getElementById("flightType").value,
-        time: Number(document.getElementById("time").value),
-        distance: Number(document.getElementById("distance").value),
-        agency: document.getElementById("agency").value,
-        date: document.getElementById("date").value
-    };
+        const res = await fetch("/full-analysis", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
 
-    const res = await fetch("/full-analysis", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
-    });
+        const result = await res.json();
 
-    const result = await res.json();
+        document.getElementById("result").innerText =
+            "💰 Price: " + result.price + "\n" +
+            "🧑 Gender: " + result.gender + "\n" +
+            "🌍 Suggestions: " + result.recommendations.join(", ");
 
-    document.getElementById("result").innerText =
-        `💰 Price: ${result.price}
-🧑 Gender: ${result.gender}
-🌍 Suggestions: ${result.recommendations.join(", ")}`;
+    } catch (err) {
+        console.error(err);
+        alert("Error in Full Analysis");
+    }
 }
 
 </script>
