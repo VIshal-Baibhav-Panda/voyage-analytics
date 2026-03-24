@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import joblib
 import numpy as np
+from flask import render_template
 
 app = Flask(__name__)
 
@@ -17,7 +18,7 @@ columns = joblib.load(os.path.join(BASE_DIR, "../models/columns.pkl"))
 # ✅ HOME ROUTE (VISIBLE IN BROWSER)
 @app.route("/")
 def home():
-    return "<h1>API Running ✅</h1>"
+    return render_template("index.html")
 
 @app.route("/predict-price", methods=["POST"])
 def predict_price():
