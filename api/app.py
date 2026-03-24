@@ -5,9 +5,14 @@ import numpy as np
 app = Flask(__name__)
 
 # ✅ CORRECT PATHS (NO ../)
-model = joblib.load("models/flight_price_model.pkl")
-encoders = joblib.load("models/encoders.pkl")
-columns = joblib.load("models/columns.pkl")
+import os
+import joblib
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+model = joblib.load(os.path.join(BASE_DIR, "../models/flight_price_model.pkl"))
+encoders = joblib.load(os.path.join(BASE_DIR, "../models/encoders.pkl"))
+columns = joblib.load(os.path.join(BASE_DIR, "../models/columns.pkl"))
 
 # ✅ HOME ROUTE (VISIBLE IN BROWSER)
 @app.route("/")
