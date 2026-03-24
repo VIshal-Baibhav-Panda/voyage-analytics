@@ -109,9 +109,10 @@ async function predictPrice() {
     const result = await res.json();
 
     document.getElementById("result").innerText =
-        "💰 Price: " + result.price;
+        "💰 Price: " + result.predicted_price;
 }
 
+<button onclick="fullAnalysis()">🚀 Full Analysis</button>
 
 // 🔥 GENDER
 async function predictGender() {
@@ -146,6 +147,34 @@ async function recommend() {
 
     document.getElementById("result").innerText =
         "🌍 Suggestions: " + data.recommendations.join(", ");
+}
+
+async function fullAnalysis() {
+
+    const data = {
+        travelCode: document.getElementById("travelCode").value,
+        userCode: Number(document.getElementById("userCode").value),
+        from: document.getElementById("from").value,
+        to: document.getElementById("to").value,
+        flightType: document.getElementById("flightType").value,
+        time: Number(document.getElementById("time").value),
+        distance: Number(document.getElementById("distance").value),
+        agency: document.getElementById("agency").value,
+        date: document.getElementById("date").value
+    };
+
+    const res = await fetch("/full-analysis", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    document.getElementById("result").innerText =
+        `💰 Price: ${result.price}
+🧑 Gender: ${result.gender}
+🌍 Suggestions: ${result.recommendations.join(", ")}`;
 }
 
 </script>

@@ -71,6 +71,44 @@ def recommend():
         "recommendations": result
     })
     
+@app.route("/full-analysis", methods=["POST"])
+def full_analysis():
+    try:
+        data = request.json
+
+        # ---------- PRICE ----------
+        input_data = []
+
+        for col in columns:
+            value = data[col]
+
+            if col in encoders:
+                value = encoders[col].transform([value])[0]
+
+            input_data.append(value)
+
+        import numpy as np
+        input_array = np.array(input_data).reshape(1, -1)
+        price = float(model.predict(input_array)[0])
+
+        # ---------- GENDER ----------
+        from src.models.gender_model import predict_gender
+        gender = predict_gender(data.get("userCode"))
+
+        # ---------- RECOMMENDATION ----------
+        from src.models.recommender import recommend_destination
+        recommendations = recommend_destination(data.get("from"))
+
+        return jsonify({
+            "price": price,
+            "gender": gender,
+            "recommendations": recommendations
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+
 # ✅ DOCKER FIX
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=False)
